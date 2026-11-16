@@ -160,15 +160,15 @@
     $('acct').oninput = calc; $('riskPct').oninput = calc; calc();
 
     // backtester
-    $('btSub').textContent = `${sym}, ${isBtc ? 'hourly' : 'daily'} candles, ${period}. Example rule: buy when the 9-${unit} average closes above the 21-${unit}; stop 1.5 ATR, target 3 ATR, or out when it crosses back.`;
+    $('btSub').textContent = `${sym}, ${isBtc ? 'hourly' : 'daily'} candles, ${period}. Example rule: buy when the 9-${unit} average closes above the 21-${unit}. Stop 1.5 ATR, target 3 ATR, or out when it crosses back.`;
     $('btKpis').innerHTML = `<div><span>Trades</span><b>${r.trades.length}</b></div><div><span>Wins</span><b>${r.wins}</b></div><div><span>Win rate</span><b>${fmt(r.winRate * 100, 1)}%</b></div><div><span>Return</span><b class="${cls(r.totalReturn)}">${pct(r.totalReturn * 100, 1)}</b></div>`;
     if (!btChart) { btChart = makeChart($('btChart'), { timeScale: { timeVisible: isBtc, borderColor: 'rgba(255,255,255,.08)' } });
       btLine = btChart.addAreaSeries({ lineColor: '#3b82f6', topColor: 'rgba(59,130,246,.25)', bottomColor: 'rgba(59,130,246,0)', lineWidth: 2, priceLineVisible: false }); }
     btChart.applyOptions({ timeScale: { timeVisible: isBtc } });
     btLine.setData(r.curve); btChart.timeScale().fitContent();
     const last = r.trades.slice(-6).reverse();
-    $('btTbl').innerHTML = '<tr><th>In</th><th>Out</th><th>Entry</th><th>Exit</th><th>Result</th></tr>' +
-      last.map(t => `<tr><td>${shortDay(t.in)}</td><td>${shortDay(t.out)}</td><td class="n">${fmt(t.entry)}</td><td class="n">${fmt(t.exit)}</td><td class="n ${cls(t.ret)}">${pct(t.ret * 100, 1)} <span class="muted">${t.why}</span></td></tr>`).join('');
+    $('btTbl').innerHTML = '<tr><th>In</th><th>Out</th><th>Entry</th><th>Exit</th><th>Result</th><th>Exit on</th></tr>' +
+      last.map(t => `<tr><td>${shortDay(t.in)}</td><td>${shortDay(t.out)}</td><td class="n">${fmt(t.entry)}</td><td class="n">${fmt(t.exit)}</td><td class="n ${cls(t.ret)}">${pct(t.ret * 100, 1)}</td><td class="why">${t.why}</td></tr>`).join('');
     state.lastRec = { sym, r };
     renderAlerts();
   }
