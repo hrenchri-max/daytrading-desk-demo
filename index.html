@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trading Desk</title>
+<meta name="theme-color" content="#0b0c0f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Crect x=%223%22 y=%223%22 width=%2210%22 height=%2210%22 rx=%222%22 fill=%22%233b82f6%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ENTRY: profile + disclaimer, shown until a profile exists -->
+<div id="entry" class="entry" hidden>
+  <form id="entryForm" class="entry-card" autocomplete="off">
+    <div class="brand big"><span class="sq"></span>Trading Desk</div>
+    <h1>Create your profile</h1>
+    <p class="muted">Live charts, scanners and trade ideas for day traders. Takes ten seconds.</p>
+    <label>Display name<input id="pName" required maxlength="30" placeholder="What should we call you?"></label>
+    <div class="two">
+      <label>Experience
+        <select id="pExp"><option>New to trading</option><option selected>Some experience</option><option>Active day trader</option></select>
+      </label>
+      <label>I mostly trade
+        <select id="pMarket"><option>Stocks</option><option>Options</option><option>Crypto</option><option selected>A mix</option></select>
+      </label>
+    </div>
+    <label class="check">
+      <input type="checkbox" id="pAgree">
+      <span><b>Nothing here is guaranteed. This is information, not financial advice.</b> Trade ideas, win rates and alerts come from past data and example rules. You make your own decisions and take your own risk, and the site is not liable for any trade you make.</span>
+    </label>
+    <button type="submit" id="pGo" class="btn primary" disabled>Enter the desk</button>
+  </form>
+</div>
+
+<!-- APP -->
+<div id="app" hidden>
+  <header class="top">
+    <div class="brand"><span class="sq"></span>Trading Desk</div>
+    <nav class="tabs">
+      <a href="#desk" data-view="desk" class="on">Desk</a>
+      <a href="#settings" data-view="settings">Settings</a>
+    </nav>
+    <div class="status"><span id="clock" class="mono"></span><span class="live"><i></i><span id="liveTxt">Connecting</span></span><span id="who" class="who"></span></div>
+  </header>
+
+  <!-- DESK -->
+  <main id="view-desk" class="grid">
+    <section class="card span2" id="cryptoCard">
+      <div class="card-h">
+        <div><div class="title">Live crypto</div><div class="sub" id="cSrc">1-minute candles, streaming</div></div>
+        <div class="seg" id="cSeg"><button data-s="BTC" class="on">BTC</button><button data-s="ETH">ETH</button><button data-s="SOL">SOL</button></div>
+      </div>
+      <div class="quote"><span class="sym" id="cSym">BTC-USD</span><span class="px mono" id="cPx">...</span><span class="chg mono" id="cChg"></span><span class="sub mono" id="cHL"></span></div>
+      <div class="chart" id="cChart"></div>
+    </section>
+
+    <section class="card bot" id="scanCard">
+      <div class="card-h">
+        <div><div class="title"><span class="dot"></span>Scanner bot</div><div class="sub" id="scanSub">Scanning</div></div>
+        <div class="seg small" id="scanSeg"><button data-k="crypto" class="on">Crypto 24h</button><button data-k="risers">Risers</button><button data-k="penny">Under $5</button><button data-k="volume">Volume</button></div>
+      </div>
+      <table class="tbl" id="scanTbl"></table>
+      <div class="foot-note" id="scanNote"></div>
+    </section>
+
+    <section class="card span2" id="stockCard">
+      <div class="card-h">
+        <div><div class="title">Stocks</div><div class="sub" id="sAsOf">Daily candles</div></div>
+        <div class="seg" id="sSeg"><button data-s="SPY" class="on">SPY</button><button data-s="AAPL">AAPL</button><button data-s="TSLA">TSLA</button><button data-s="NVDA">NVDA</button><button data-s="MSFT">MSFT</button></div>
+      </div>
+      <div class="quote"><span class="sym" id="sSym">SPY</span><span class="px mono" id="sPx"></span><span class="chg mono" id="sChg"></span><span class="legend"><i class="l1"></i>9-day <i class="l2"></i>21-day</span></div>
+      <div class="chart" id="sChart"></div>
+    </section>
+
+    <section class="card bot" id="recCard">
+      <div class="card-h">
+        <div><div class="title"><span class="dot"></span>Recommender bot</div><div class="sub">Where to put your numbers</div></div>
+        <select id="recSym" class="sel"></select>
+      </div>
+      <div id="recBody"></div>
+    </section>
+
+    <section class="card bot span2" id="btCard">
+      <div class="card-h">
+        <div><div class="title"><span class="dot"></span>Backtester bot</div><div class="sub" id="btSub"></div></div>
+        <div class="kpis mono" id="btKpis"></div>
+      </div>
+      <div class="bt-wrap">
+        <div class="chart small" id="btChart"></div>
+        <table class="tbl trades" id="btTbl"></table>
+      </div>
+    </section>
+
+    <section class="card" id="alertCard">
+      <div class="card-h">
+        <div><div class="title">Your alerts</div><div class="sub" id="alertSub"></div></div>
+        <a href="#settings" class="btn ghost small">Edit</a>
+      </div>
+      <div class="tg" id="alertMsg"></div>
+      <div class="chips" id="alertChips"></div>
+    </section>
+
+    <p class="disclaimer span3">Nothing here is guaranteed. This is information, not financial advice. Win rates come from an example strategy run on past candles; past results do not predict future ones.</p>
+  </main>
+
+  <!-- SETTINGS -->
+  <main id="view-settings" class="settings" hidden>
+    <form id="setForm" class="card set-card" onsubmit="return false">
+      <h2>Settings</h2>
+      <p class="muted">Pick what you want to see and how you want to hear about it. Saved on this device.</p>
+
+      <h3>Favorite tickers</h3>
+      <div class="chips edit" id="favChips"></div>
+      <div class="add-row"><input id="favIn" maxlength="10" placeholder="Add a ticker, e.g. AMD"><button class="btn small" id="favAdd" type="button">Add</button></div>
+
+      <h3>Categories</h3>
+      <div class="toggles" id="catToggles"></div>
+
+      <h3>Alerts</h3>
+      <div class="chan">
+        <label class="tgl"><input type="checkbox" id="tgOn"><span class="sw"></span>Telegram</label>
+        <input id="tgUser" placeholder="Telegram username" maxlength="40">
+      </div>
+      <div class="chan">
+        <label class="tgl"><input type="checkbox" id="dcOn"><span class="sw"></span>Discord</label>
+        <input id="dcUser" placeholder="Discord username" maxlength="40">
+      </div>
+      <div class="two">
+        <label>How often
+          <select id="freq"><option value="instant">As it happens</option><option value="hourly">Hourly digest</option><option value="open">Once, at the market open</option><option value="close">Once, after the close</option></select>
+        </label>
+        <label>Risk level
+          <select id="risk"><option>Conservative</option><option selected>Balanced</option><option>Aggressive</option></select>
+        </label>
+      </div>
+      <div class="save-row"><button class="btn primary" id="saveBtn" type="button">Save settings</button><span id="savedMsg" class="saved" hidden>Saved</span><button class="btn ghost" id="resetBtn" type="button">Sign out</button></div>
+    </form>
+  </main>
+</div>
+
+<script src="vendor/lightweight-charts.js"></script>
+<script src="strategy.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
